@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3x3 赤潮 Puzzle Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('approval_walk.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    #puzzle {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 2px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 2px;
+      margin-bottom: 20px;
+    }
+    .tile {
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .empty {
+      background: transparent;
+      cursor: default;
+    }
+    #controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-direction: column;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #555;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #777;
+    }
+    #credits {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    #credits a {
+      color: #f00;
+      text-decoration: none;
+    }
+    #credits a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      #puzzle {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(3, 60px);
+      }
+      .tile {
+        width: 60px;
+        height: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="puzzle"></div>
+  <div id="controls">
+    <button id="reset">シャッフルする？</button>
+    <div id="credits">
+      by 赤潮<br>
+      <a href="https://x.com/KANOKE_SUKOPPU" target="_blank">https://x.com/KANOKE_SUKOPPU</a>
+    </div>
+  </div>
+
+  <script>
+    const puzzle = document.getElementById('puzzle');
+    const resetButton = document.getElementById('reset');
+
+    const imageTiles = [
+      'tile_1.png', 'tile_2.png', 'tile_3.png',
+      'tile_4.png', 'tile_5.png', 'tile_6.png',
+      'tile_7.png', 'tile_8.png'
+    ];
+
+    let tiles = [];
+    let emptyTile;
+    let isCompleted = false;
+
+    function createTile(src, isEmpty = false) {
+      const tile = document.createElement('div');
+      tile.classList.add('tile');
+      if (isEmpty) {
+        tile.classList.add('empty');
+      } else {
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        tile.appendChild(img);
+      }
+      return tile;
+    }
+
+    function initializePuzzle() {
+      tiles = imageTiles.map((src) => createTile(src));
+      emptyTile = createTile('', true);
+      tiles.push(emptyTile);
+
+      shuffleTiles();
+      renderPuzzle();
+    }
+
+    function renderPuzzle() {
+      puzzle.innerHTML = '';
+      tiles.forEach(tile => puzzle.appendChild(tile));
+
+      if (checkCompletion() && !isCompleted) {
+        isCompleted = true;
+        emptyTile.innerHTML = '<img src="tile_9.png" style="width: 100%; height: 100%;">';
+        alert('完成しました！おめでとう！');
+      }
+    }
+
+    function shuffleTiles() {
+      do {
+        tiles.sort(() => Math.random() - 0.5);
+      } while (!isSolvable(tiles));
+    }
+
+    function handleTileClick(e) {
+      e.preventDefault();
+      const clickedTile = e.target.closest('.tile');
+      if (!clickedTile || clickedTile.classList.contains('empty') || isCompleted) {
+        return;
+      }
+
+      try {
+        const emptyIndex = Array.from(puzzle.children).indexOf(emptyTile);
+        const clickedIndex = Array.from(puzzle.children).indexOf(clickedTile);
+
+        const emptyRow = Math.floor(emptyIndex / 3);
+        const emptyCol = emptyIndex % 3;
+        const clickedRow = Math.floor(clickedIndex / 3);
+        const clickedCol = clickedIndex % 3;
+
+        if ((Math.abs(emptyRow - clickedRow) === 1 && emptyCol === clickedCol) ||
+            (Math.abs(emptyCol - clickedCol) === 1 && emptyRow === clickedRow)) {
+          const temp = tiles[emptyIndex];
+          tiles[emptyIndex] = tiles[clickedIndex];
+          tiles[clickedIndex] = temp;
+          renderPuzzle();
+        }
+      } catch (error) {
+        console.error('An error occurred during tile movement:', error);
+      }
+    }
+
+    function checkCompletion() {
+      for (let i = 0; i < imageTiles.length; i++) {
+        const tile = tiles[i];
+        const img = tile.querySelector('img');
+        if (!img || !img.src.includes(imageTiles[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function isSolvable(tiles) {
+      const positions = tiles.map(tile => tile.classList.contains('empty') ? 0 : imageTiles.indexOf(tile.querySelector('img')?.src.split('/').pop()) + 1);
+      let inversions = 0;
+      for (let i = 0; i < positions.length; i++) {
+        for (let j = i + 1; j < positions.length; j++) {
+          if (positions[i] > positions[j] && positions[j] !== 0) {
+            inversions++;
+          }
+        }
+      }
+      return inversions % 2 === 0;
+    }
+
+    puzzle.addEventListener('click', handleTileClick);
+    puzzle.addEventListener('touchstart', handleTileClick);
+
+    resetButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      isCompleted = false;
+      shuffleTiles();
+      renderPuzzle();
+    });
+
+    initializePuzzle();
+  </script>
+</body>
+</html>
