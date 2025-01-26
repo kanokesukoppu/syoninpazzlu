@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3x3 Slide Puzzle Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('中で歩く承認.gif');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      overflow: hidden;
+    }
+    #puzzle {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 2px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 2px;
+      margin-bottom: 20px;
+    }
+    .tile {
+      width: 100px;
+      height: 100px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .empty {
+      background: transparent;
+      cursor: default;
+    }
+    #controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-direction: column;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #555;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #777;
+    }
+    #help {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+      background-color: #444;
+      color: #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #help-content {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      width: 250px;
+      padding: 10px;
+      background-color: #555;
+      color: white;
+      border-radius: 8px;
+    }
+    #credits {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    #credits a {
+      color: #f00;
+      text-decoration: none;
+    }
+    #credits a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body style="background-image: url('中で歩く承認.gif'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+  <div id="help">?</div>
+  <div id="help-content">
+    <strong>3×3パズルの解き方:</strong>
+    <ol>
+      <li>左上から順番に数字を揃えます。</li>
+      <li>一列ずつ完成させ、最後に右下を調整します。</li>
+      <li>空白マスを利用してピースをスライドしてください。</li>
+    </ol>
+  </div>
+  <div id="puzzle"></div>
+  <div id="controls">
+    <button id="reset">シャッフルする？</button>
+    <div id="credits">
+      by 赤潮<br>
+      <a href="https://x.com/KANOKE_SUKOPPU" target="_blank">https://x.com/KANOKE_SUKOPPU</a>
+    </div>
+  </div>
+  <script>
+    // 省略済み: JavaScriptコードはそのまま維持
+    initializePuzzle();
+  </script>
+</body>
+</html>
